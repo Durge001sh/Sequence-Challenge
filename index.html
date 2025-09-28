@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Sequence Challenge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+        
+        .game-container {
+            background: rgba(10, 15, 30, 0.85);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        inset 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent 30%
+            );
+            animation: rotate 6s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .game-header {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .game-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff8a00, #da1b60, #00c9ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 138, 0, 0.3);
+            letter-spacing: 1px;
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px rgba(255, 138, 0, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 30px rgba(255, 138, 0, 0.7), 0 0 40px rgba(218, 27, 96, 0.5);
+            }
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #a0a0c0;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(20, 25, 45, 0.7);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .stat-item::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 2px;
+            height: 60%;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+        
+        .stat-item:last-child::after {
+            display: none;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: #8a8ab8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
+        }
+        
+        .sequence-info {
+            background: rgba(30, 35, 60, 0.7);
+            padding: 12px 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            color: #e0e0ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .sequence-info i {
+            color: #00c9ff;
+            font-size: 1.3rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .grid-container {
+            display: grid;
+            gap: 8px;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(20, 25, 45, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .tile {
+            aspect-ratio: 1;
+            background: rgba(40, 45, 75, 0.7);
+            border: 2px solid rgba(100, 150, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            color: #e0e0ff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tile::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(100, 150, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tile:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: rgba(100, 150, 255, 0.7);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(100, 150, 255, 0.3);
+            z-index: 2;
+        }
+        
+        .tile:hover::before {
+            opacity: 1;
+        }
+        
+        .tile.correct {
+            background: rgba(76, 175, 80, 0.9);
+            border-color: #4CAF50;
+            color: white;
+            transform: scale(1.1) !important;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.7) !important;
+            animation: correctPulse 0.6s ease-out;
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); }
+        }
+        
+        .tile.incorrect {
+            background: rgba(229, 57, 53, 0.9);
+            border-color: #E53935;
+            color: white;
+            transform: scale(1.1) rotate(5deg) !important;
+            box-shadow: 0 0 30px rgba(229, 57, 53, 0.7) !important;
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translateX(5px) rotate(2deg); }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-width: 160px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .btn:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #FF6600, #FF3366);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 102, 0, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 102, 0, 0.6);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #1a1a2e;
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 201, 255, 0.6);
+        }
+        
+        .win-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        
+        .win-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .win-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 500px;
+            transform: scale(0.8);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7),
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        inset 0 0 30px rgba(255, 102, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .win-message.show .win-content {
+            transform: scale(1);
+        }
+        
+        .win-content::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent 30%
+            );
+            animation: rotate 8s linear infinite;
+            z-index: -1;
+        }
+        
+        .win-title {
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            animation: celebration 2s infinite alternate;
+        }
+        
+        @keyframes celebration {
+            0% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            100% { text-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 102, 0, 0.8); }
+        }
+        
+        .win-stats {
+            margin: 25px 0;
+            font-size: 1.4rem;
+            color: #e0e0ff;
+        }
+        
+        .win-stats div {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .win-stats span {
+            font-weight: bold;
+            color: #00c9ff;
+        }
+        
+        .difficulty-selector {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .difficulty-btn {
+            padding: 12px 25px;
+            border: 2px solid rgba(100, 150, 255, 0.5);
+            border-radius: 50px;
+            background: rgba(30, 35, 60, 0.7);
+            color: #a0a0c0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 140px;
+        }
+        
+        .difficulty-btn:hover {
+            border-color: rgba(100, 150, 255, 0.8);
+            background: rgba(40, 45, 75, 0.8);
+            color: #e0e0ff;
+            transform: translateY(-3px);
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(45deg, #FF6600, #FF3366);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(255, 102, 0, 0.4);
+        }
+        
+        .settings {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .setting-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(30, 35, 60, 0.7);
+            border: 2px solid rgba(100, 150, 255, 0.5);
+            color: #a0a0c0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-btn:hover {
+            background: rgba(40, 45, 75, 0.8);
+            color: #e0e0ff;
+            transform: translateY(-3px);
+            border-color: rgba(100, 150, 255, 0.8);
+        }
+        
+        .sound-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(30, 35, 60, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(100, 150, 255, 0.5);
+        }
+        
+        .sound-indicator.muted {
+            color: #e53935;
+        }
+        
+        .sound-indicator:not(.muted) {
+            color: #4CAF50;
+            animation: pulseSound 2s infinite;
+        }
+        
+        @keyframes pulseSound {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #00c9ff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .tile {
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+                min-width: 140px;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sound-indicator" id="soundToggle">
+        <i class="fas fa-volume-up"></i>
+    </div>
+    
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">SEQUENCE CHALLENGE</h1>
+            <p class="subtitle">Master the sequence through 16 challenging rounds!</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label"> Time</div>
+                <div class="stat-value" id="timer">00:00</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label"> Score</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label"> Progress</div>
+                <div class="stat-value" id="progress">0/16</div>
+            </div>
+        </div>
+        
+        <div class="sequence-info">
+            <i class="fas fa-arrow-right"></i>
+            <span id="sequenceText">Click numbers from 1 to 25 in ascending order</span>
+        </div>
+        
+        <div class="grid-container" id="grid"></div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-size="5">Easy (55)</button>
+            <button class="difficulty-btn" data-size="6">Hard (66)</button>
+            <button class="difficulty-btn" data-size="12">Ultra Hard (1212)</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="restartBtn">
+                <i class="fas fa-redo"></i> Restart
+            </button>
+            <button class="btn btn-secondary" id="rewardBtn">
+                <i class="fas fa-gift"></i> Reward Ad
+<script type='text/javascript' src='//pl27490248.revenuecpmgate.com/23/5e/21/235e210890eb0d94211e84451721a76a.js'></script>
+            </button>
+        </div>
+    </div>
+    
+    <div class="win-message" id="winMessage">
+        <div class="win-content">
+            <div class="win-title"> CONGRATULATIONS! </div>
+            <div class="win-stats">
+                <div>Final Score: <span id="finalScore">0</span></div>
+                <div>Total Time: <span id="finalTime">00:00</span></div>
+                <div>Sequences Completed: <span>16/16</span></div>
+            </div>
+            <button class="btn btn-primary" id="playAgainBtn">
+                <i class="fas fa-play"></i> Play Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Audio context for sound effects
+        let audioContext;
+        let isMuted = false;
+        
+        // Create sound effects
+        function playCorrectSound() {
+            if (isMuted || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        function playIncorrectSound() {
+            if (isMuted || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 200;
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+        
+        function playWinSound() {
+            if (isMuted || !audioContext) return;
+            
+            const frequencies = [523.25, 659.25, 783.99, 1046.50];
+            frequencies.forEach((freq, i) => {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = freq;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.8);
+                }, i * 300);
+            });
+        }
+        
+        // Create particles for animations
+        function createParticles(x, y, color) {
+            const particleCount = 15;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                document.body.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 3;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                const size = 5 + Math.random() * 10;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                let opacity = 1;
+                const animate = () => {
+                    const currentX = parseFloat(particle.style.left);
+                    const currentY = parseFloat(particle.style.top);
+                    
+                    particle.style.left = `${currentX + vx}px`;
+                    particle.style.top = `${currentY + vy}px`;
+                    opacity -= 0.02;
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        // Game state
+        let gameState = {
+            currentNumber: 1,
+            targetNumber: 25,
+            direction: 'ascending',
+            sequenceIndex: 0,
+            sequences: [
+                { start: 1, end: 25, direction: 'ascending', description: '1 to 25 ascending' },
+                { start: 25, end: 1, direction: 'descending', description: '25 to 1 descending' },
+                { start: 25, end: 50, direction: 'ascending', description: '25 to 50 ascending' },
+                { start: 50, end: 25, direction: 'descending', description: '50 to 25 descending' },
+                { start: 50, end: 75, direction: 'ascending', description: '50 to 75 ascending' },
+                { start: 75, end: 50, direction: 'descending', description: '75 to 50 descending' },
+                { start: 75, end: 100, direction: 'ascending', description: '75 to 100 ascending' },
+                { start: 100, end: 75, direction: 'descending', description: '100 to 75 descending' },
+                { start: 100, end: 125, direction: 'ascending', description: '100 to 125 ascending' },
+                { start: 125, end: 100, direction: 'descending', description: '125 to 100 descending' },
+                { start: 125, end: 150, direction: 'ascending', description: '125 to 150 ascending' },
+                { start: 150, end: 125, direction: 'descending', description: '150 to 125 descending' },
+                { start: 150, end: 175, direction: 'ascending', description: '150 to 175 ascending' },
+                { start: 175, end: 150, direction: 'descending', description: '175 to 150 descending' },
+                { start: 175, end: 200, direction: 'ascending', description: '175 to 200 ascending' },
+                { start: 200, end: 175, direction: 'descending', description: '200 to 175 descending' }
+            ],
+            score: 0,
+            startTime: null,
+            timerInterval: null,
+            gridSize: 5,
+            numbers: [],
+            completedSequences: 0
+        };
+
+        // DOM Elements
+        const grid = document.getElementById('grid');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const progressDisplay = document.getElementById('progress');
+        const sequenceText = document.getElementById('sequenceText');
+        const restartBtn = document.getElementById('restartBtn');
+        const rewardBtn = document.getElementById('rewardBtn');
+        const winMessage = document.getElementById('winMessage');
+        const finalScore = document.getElementById('finalScore');
+        const finalTime = document.getElementById('finalTime');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const soundToggle = document.getElementById('soundToggle');
+
+        // Initialize audio context on first user interaction
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        // Initialize game
+        function initGame() {
+            initAudio();
+            
+            // Reset game state
+            gameState.currentNumber = gameState.sequences[0].start;
+            gameState.targetNumber = gameState.sequences[0].end;
+            gameState.direction = gameState.sequences[0].direction;
+            gameState.sequenceIndex = 0;
+            gameState.score = 0;
+            gameState.completedSequences = 0;
+            gameState.startTime = Date.now();
+            
+            // Clear existing grid
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${gameState.gridSize}, 1fr)`;
+            
+            // Generate numbers for current sequence
+            generateNumbers();
+            
+            // Update displays
+            updateDisplays();
+            startTimer();
+            
+            // Create grid
+            createGrid();
+        }
+
+        function generateNumbers() {
+            const sequence = gameState.sequences[gameState.sequenceIndex];
+            const numbers = [];
+            
+            if (sequence.direction === 'ascending') {
+                for (let i = sequence.start; i <= sequence.end; i++) {
+                    numbers.push(i);
+                }
+            } else {
+                for (let i = sequence.start; i >= sequence.end; i--) {
+                    numbers.push(i);
+                }
+            }
+            
+            // Fill remaining cells with random numbers
+            const totalCells = gameState.gridSize * gameState.gridSize;
+            while (numbers.length < totalCells) {
+                const randomNum = Math.floor(Math.random() * 200) + 1;
+                if (!numbers.includes(randomNum)) {
+                    numbers.push(randomNum);
+                }
+            }
+            
+            // Shuffle the array
+            shuffleArray(numbers);
+            gameState.numbers = numbers;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createGrid() {
+            grid.innerHTML = '';
+            gameState.numbers.forEach((num, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = num;
+                tile.dataset.number = num;
+                tile.addEventListener('click', (e) => handleTileClick(num, tile, e));
+                grid.appendChild(tile);
+            });
+        }
+
+        function handleTileClick(number, tile, event) {
+            if (number === gameState.currentNumber) {
+                // Correct click
+                tile.classList.add('correct');
+                playCorrectSound();
+                
+                // Create particles at click position
+                const rect = tile.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                createParticles(x, y, '#4CAF50');
+                
+                gameState.score += 10;
+                updateDisplays();
+                
+                // Move to next number
+                if (gameState.direction === 'ascending') {
+                    gameState.currentNumber++;
+                } else {
+                    gameState.currentNumber--;
+                }
+                
+                // Check if sequence is complete
+                if (gameState.direction === 'ascending' && gameState.currentNumber > gameState.targetNumber) {
+                    completeSequence();
+                } else if (gameState.direction === 'descending' && gameState.currentNumber < gameState.targetNumber) {
+                    completeSequence();
+                }
+            } else {
+                // Incorrect click
+                tile.classList.add('incorrect');
+                playIncorrectSound();
+                
+                // Create particles at click position
+                const rect = tile.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                createParticles(x, y, '#E53935');
+                
+                setTimeout(() => {
+                    tile.classList.remove('incorrect');
+                }, 600);
+            }
+        }
+
+        function completeSequence() {
+            gameState.completedSequences++;
+            
+            if (gameState.completedSequences >= gameState.sequences.length) {
+                // Game completed
+                endGame();
+                return;
+            }
+            
+            // Move to next sequence
+            gameState.sequenceIndex++;
+            const nextSequence = gameState.sequences[gameState.sequenceIndex];
+            gameState.currentNumber = nextSequence.start;
+            gameState.targetNumber = nextSequence.end;
+            gameState.direction = nextSequence.direction;
+            
+            // Regenerate numbers and grid
+            generateNumbers();
+            createGrid();
+            updateDisplays();
+        }
+
+        function endGame() {
+            clearInterval(gameState.timerInterval);
+            finalScore.textContent = gameState.score;
+            finalTime.textContent = timerDisplay.textContent;
+            winMessage.classList.add('show');
+            playWinSound();
+        }
+
+        function updateDisplays() {
+            scoreDisplay.textContent = gameState.score;
+            progressDisplay.textContent = `${gameState.completedSequences}/${gameState.sequences.length}`;
+            
+            const currentSeq = gameState.sequences[gameState.sequenceIndex];
+            sequenceText.textContent = `Click numbers from ${currentSeq.start} to ${currentSeq.end} in ${currentSeq.direction} order`;
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            gameState.startTime = Date.now();
+            gameState.timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const seconds = (elapsed % 60).toString().padStart(2, '0');
+                timerDisplay.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        // Event Listeners
+        restartBtn.addEventListener('click', initGame);
+        
+        rewardBtn.addEventListener('click', () => {
+            if (!isMuted) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 1000;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+            
+            gameState.score += 20;
+            updateDisplays();
+            
+            // Show reward animation
+            rewardBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Applied!';
+            setTimeout(() => {
+                rewardBtn.innerHTML = '<i class="fas fa-gift"></i> Reward Ad';
+            }, 2000);
+        });
+        
+        playAgainBtn.addEventListener('click', () => {
+            winMessage.classList.remove('show');
+            initGame();
+        });
+        
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                difficultyBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                gameState.gridSize = parseInt(btn.dataset.size);
+                initGame();
+            });
+        });
+        
+        soundToggle.addEventListener('click', () => {
+            isMuted = !isMuted;
+            soundToggle.classList.toggle('muted', isMuted);
+            soundToggle.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+        });
+
+        // Initialize game on load
+        window.addEventListener('load', () => {
+            initGame();
+        });
+        
+        // Initialize audio on first user interaction
+        document.addEventListener('click', initAudio, { once: true });
+    </script>
+</body>
+</html>
